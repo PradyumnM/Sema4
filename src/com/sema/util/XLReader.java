@@ -64,6 +64,25 @@ public class XLReader {
 			ResultSet crs=catStmt.executeQuery("SELECT * FROM genecategory;"); 
 			
 			for (File file : listOfFiles) {
+				BufferedReader br = new BufferedReader(new FileReader(file));
+				if (file.isFile()) {
+					int i = file.getName().lastIndexOf('.');
+					if (i > 0) {
+						extension = file.getName().substring(i+1);
+					}
+					if(file.getName().equalsIgnoreCase("1.start.sql")) {
+						System.out.println("writing "+file.getName());
+						while ((line1 = br.readLine()) != null) {
+							fw.write(line1);
+							fw.newLine();
+						
+						}//while end	
+					
+					}
+				}//If file End
+				}
+			
+			for (File file : listOfFiles) {
 				if (file.isFile()) {
 					int i = file.getName().lastIndexOf('.');
 					if (i > 0) {
@@ -75,7 +94,7 @@ public class XLReader {
 						System.out.println("writing "+file.getName());
 						BufferedReader br = new BufferedReader(new FileReader(file));
 						while ((line1 = br.readLine()) != null) {
-							System.out.println(line1);
+							//System.out.println(line1);
 							if (file.getName().equalsIgnoreCase(geneCatFile1))
 							geneSet.put(line1,geneCatName1);
 							if (file.getName().equalsIgnoreCase(geneCatFile2))
@@ -100,39 +119,66 @@ public class XLReader {
 			}
 //Writing to gene table
 			ResultSet rs=stmt.executeQuery("SELECT * FROM run_combination;");  
+			int flag1=0;
+			fw.newLine();
+			fw.write("insert into gene(`name`,`run_combination_id`) values");
 			while(rs.next())  
 			{
 			// System.out.println(rs.getInt(1)+"  "+rs.getInt(4)); 
 			temp= Integer.toString(rs.getInt(1));
 			runCombIdList.add(temp);
+			
 			for (String key : geneSet.keySet()) {
-			    
-				//System.out.println(itr.next());
-				fw.write("insert into gene(`name`,`run_combination_id`) values ("+key+","+temp+");");
+				if(flag1==0) 
+			    {
+					fw.write("(");
+			flag1=1;
+		        }
+			else
+			{fw.write(",");
 				fw.newLine();
+				fw.write("(");
 			}
-			} 
+				//System.out.println(itr.next());
+				fw.write(key+","+temp+")");
+				
+			}
+			} fw.write(";");
 //Writing to target table			
 			for (File file : listOfFiles) {
 
 				if(file.getName().equalsIgnoreCase("targetList.csv")) {
 					System.out.println("writing target file "+file.getName());
 					BufferedReader br = new BufferedReader(new FileReader(file));
+					fw.newLine();
 					colNameBuff.append("INSERT INTO TARGET "+ "(");
-					colNameBuff.append(br.readLine()+",run_combination_id)"+" VALUES (");
+					colNameBuff.append(br.readLine()+",run_combination_id)"+" VALUES ");
+					fw.write(colNameBuff.toString());
+					int flag=0;
 					while ((line1 = br.readLine()) != null) {
 
 						for(int i=0;i<runCombIdList.size();i++)
-						{
-							recordBuff.append(colNameBuff);
+						{ 
+							if(flag==0) 
+							    {
+							recordBuff.append("(");
+							flag=1;
+						        }
+							else
+							{fw.write(",");
+								fw.newLine();
+							recordBuff.append("(");
+							}
+							
 							recordBuff.append(line1);
-							recordBuff.append(","+runCombIdList.get(i)+");");
+							recordBuff.append(","+runCombIdList.get(i)+")");
 							fw.write(recordBuff.toString());
-							fw.newLine();
+							
 							recordBuff.setLength(0);
 						}
 
 					}
+					fw.write(";");
 					br.close();
 				}
 			}
@@ -140,6 +186,7 @@ public class XLReader {
 //Writing to GeneGeneCategory 
 			ResultSet gst=geneStmt.executeQuery("SELECT * FROM gene;"); 
 			int i=1;
+			fw.newLine();
 			while(gst.next())  
 			{
 				fw.write("insert into gene_genecategory (`id`,`genecategory_id`,`gene_id`)values ("+ i++ + ","+"(select id from genecategory where category_name='"+ geneSet.get(gst.getString(2))+"')"+ ","+ gst.getInt(1)+");");
