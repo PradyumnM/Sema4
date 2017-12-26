@@ -17,172 +17,187 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.sql.*;
 
 
 public class RandomGen {
 
-	public static void main(String[] args) throws IOException {
-		/*       String excelFilePath = "depth_config_stats.xlsx";
-        String fileName = "filename.sql";
-        FileInputStream inputStream = new FileInputStream(new File(excelFilePath));
-
-        Workbook workbook = new XSSFWorkbook(inputStream);
-        Sheet firstSheet = workbook.getSheetAt(0);
-        Iterator<Row> iterator = firstSheet.iterator();
-        BufferedWriter bw = new BufferedWriter(new FileWriter(fileName)) ;
-        while (iterator.hasNext()) {
-            Row nextRow = iterator.next();
-            Iterator<Cell> cellIterator = nextRow.cellIterator();
-
-            while (cellIterator.hasNext()) {
-                Cell cell = cellIterator.next();
-
-                switch (cell.getCellType()) {
-                    case Cell.CELL_TYPE_STRING:
-                        //System.out.print(cell.getStringCellValue());
-                    	bw.write(cell.getStringCellValue());
-                        break;
-                    case Cell.CELL_TYPE_BOOLEAN:
-                        System.out.print(cell.getBooleanCellValue());
-                        break;
-                    case Cell.CELL_TYPE_NUMERIC:
-                        System.out.print(cell.getNumericCellValue());
-                        break;
-                }
-                System.out.print(" - ");
-            }
-            System.out.println();
-        }
-		 */
+	@SuppressWarnings("deprecation")
+	public static void main(String[] args) {}
 
 
+void writeExcelContentToSQlFile(BufferedWriter fw) throws IOException{
 
 
-		File folder = new File("/home/pradyumnm/Downloads/targetlistgeneslist/");
-		String geneCatFile1= "geneList.hgnc.cds.txt";
-		String geneCatFile2= "geneList.hgnc.cnv.txt";
-		String geneCatFile3= "geneList.hgnc.fusion.txt";
-		String geneCatFile4= "geneList.hgnc.hotspot.txt";
-		
-		String geneCatName1= "All Coding Exons Sequenced";
-		String geneCatName2= "Copy Number Abnnormalities Queried";
-		String geneCatName3= "Rearrangements/Fusions Queried";
-		String geneCatName4= "Hotspot Regions Sequenced";
-		File[] listOfFiles = folder.listFiles();
-		for (File file : listOfFiles) {
-			if (file.isFile()) {
-				System.out.println(file.getName());
-			}
-		}
-		String line1="";
-		String extension = "";
-		String fileSql = "targetSql.txt";
-		StringBuffer fileBuff = new StringBuffer("");
-		StringBuffer colNameBuff = new StringBuffer("");
-		StringBuffer recordBuff = new StringBuffer("");
-		HashMap<String,Integer> geneSet = new HashMap<String,Integer>();
-		ArrayList<String> runCombIdList = new ArrayList<String>();
-		String temp ="";
-		 String cvsSplitBy = ",";
-		
-			BufferedWriter fw = new BufferedWriter(new FileWriter(fileSql)) ;
-			
-			
-		
+	HashMap<String,String[]> masterConfigMap = new HashMap<String,String[]>();
+	HashSet<String> idSet= new HashSet<String>();
 
-		
-			
-		for (File file : listOfFiles) {
+	try {
+		FileInputStream file = new FileInputStream(new File("/home/pradyumnm/Downloads/targetlistgeneslist/master config - controls - validation.xlsx"));
 
-				if(file.getName().equalsIgnoreCase("master config - controls - validation.xlsx - Sheet1.csv")) {
-					System.out.println("writing target file "+file.getName());
-					BufferedReader br = new BufferedReader(new FileReader(file));
-					line1 = br.readLine();
-					colNameBuff.append("INSERT INTO SAMPLE "+ "(");
-					colNameBuff.append("lims_sample_id,sample_type) VALUES ( ");
-					while ((line1 = br.readLine()) != null) {
+		//Create Workbook instance holding reference to .xlsx file
+		XSSFWorkbook workbook = new XSSFWorkbook(file);
 
-						
-							recordBuff.append(colNameBuff);
-							recordBuff.append("'"+line1.split(cvsSplitBy)[0]+"'"+","+ "'"+"Control"+"'"+ ");");
-						
-							fw.write(recordBuff.toString());
-							fw.newLine();
-							recordBuff.setLength(0);
-						}
-					br.close();
-					}
-					
-				} 
-		colNameBuff.setLength(0);
-		recordBuff.setLength(0);
-			for (File file : listOfFiles) {
+		//Get first/desired sheet from the workbook
+		XSSFSheet sheet = workbook.getSheetAt(0);
 
-				if(file.getName().equalsIgnoreCase("master config - controls - validation.xlsx - Sheet1.csv")) {
-					System.out.println("writing target file "+file.getName());
-					BufferedReader br = new BufferedReader(new FileReader(file));
-					line1 = br.readLine();
-					colNameBuff.append("INSERT INTO control_sample_variants_reference "+ "(");
-					colNameBuff.append("sample_id,target_name,chromosome,position,ref_allele,alt_allele,gene,cdna_change,protein_change,expected_al,expected_al_start,expected_al_end) VALUES ( ");
-					while ((line1 = br.readLine()) != null) {
+		//Iterate through each rows one by one
+		Iterator<Row> rowIterator = sheet.iterator();
+		String [] records = new String[13];
+		int i=0;
 
-						 String[] records = line1.split(cvsSplitBy);
-							recordBuff.append(colNameBuff);
-							recordBuff.append( "(select id from sample where lims_sample_id ='"+records[0]+"')");
-							if(records[1].charAt(0)=='"')
-							{
-								recordBuff.append(","+"'"+records[1].substring(1)+","+records[2].substring(0,records[2].length()-1)+"'");
-								recordBuff.append(","+"'"+records[3]+"'");
-								recordBuff.append(","+"'"+records[4]+"'");
-								recordBuff.append(","+"'"+records[5]+"'");
-								
-								recordBuff.append(","+"'"+records[6]+"'");
-								recordBuff.append(","+"'"+records[7]+"'");
-								
-								recordBuff.append(","+"'"+records[8]+"'");
-								recordBuff.append(","+"'"+records[9]+"'");
-								recordBuff.append(","+"'"+records[10]+"'");
-								recordBuff.append(","+"'"+records[11]+"'");
-								recordBuff.append(","+"'"+records[12]+"'");
-							}
-							else{recordBuff.append(","+"'"+records[1]+"'");
-							recordBuff.append(","+"'"+records[2]+"'");
-							recordBuff.append(","+"'"+records[3]+"'");
-							recordBuff.append(","+"'"+records[4]+"'");
-							
-							recordBuff.append(","+"'"+records[5]+"'");
-							recordBuff.append(","+"'"+records[6]+"'");
-							
-							recordBuff.append(","+"'"+records[7]+"'");
-							recordBuff.append(","+"'"+records[8]+"'");
-							recordBuff.append(","+"'"+records[9]+"'");
-							recordBuff.append(","+"'"+records[10]+"'");
-							recordBuff.append(","+"'"+records[11]+"'"+");");
-							}
-							fw.write(recordBuff.toString());
-							fw.newLine();
-							recordBuff.setLength(0);
-						}
-					br.close();
-					}
-					
+
+		while (rowIterator.hasNext())
+
+		{
+			Row row = rowIterator.next();
+			//For each row, iterate through all the columns
+			Iterator<Cell> cellIterator = row.cellIterator();
+			i=0;
+			while (cellIterator.hasNext())
+			{
+				Cell cell = cellIterator.next();
+				//Check the cell type and format accordingly
+				switch (cell.getCellType())
+				{
+				case Cell.CELL_TYPE_NUMERIC:
+					records[i++]=Double.toString(cell.getNumericCellValue());
+					System.out.println(cell.getNumericCellValue());
+
+					break;
+				case Cell.CELL_TYPE_STRING:
+					records[i++]=cell.getStringCellValue();
+					System.out.println(cell.getStringCellValue());
+
+					break;
 				}
-			
-			
-			
-			
-			
-		
-			
-			fw.close(); 
-	
-		
+
+			}
+			System.out.println("records"+" "+records[0]+" "+records[2]+" "+records[3]);
+			idSet.add(records[0]);
+			masterConfigMap.put(records[0]+"_"+records[1]+"_"+records[3]+"_"+records[4]+"_"+records[5], records);
+		}
+		file.close();
 	}
-	
+	catch (Exception e)
+	{
+		e.printStackTrace();
+	}
 
 
+
+	File folder = new File("/home/pradyumnm/Downloads/targetlistgeneslist/");
+	File[] listOfFiles = folder.listFiles();
+	for (File file : listOfFiles) {
+		if (file.isFile()) {
+			System.out.println(file.getName());
+		}
+	}
+	String line1="";
+	String extension = "";
+	String fileSql = "targetSql.txt";
+	StringBuffer fileBuff = new StringBuffer("");
+	StringBuffer colNameBuff = new StringBuffer("");
+	StringBuffer recordBuff = new StringBuffer("");
+	HashMap<String,Integer> geneSet = new HashMap<String,Integer>();
+	ArrayList<String> runCombIdList = new ArrayList<String>();
+	String temp ="";
+	String cvsSplitBy = ",";
+
+	//BufferedWriter fw = new BufferedWriter(new FileWriter(fileSql)) ;
+
+
+
+
+	int flag =0;
+
+
+	colNameBuff.append("INSERT INTO SAMPLE "+ "(");
+	colNameBuff.append("lims_sample_id,sample_type) VALUES  ");
+	fw.write(colNameBuff.toString());
+	for (String s: idSet) {
+
+
+		if(flag==0) 
+		{
+			recordBuff.append("(");
+			flag=1;
+		}
+		else
+		{fw.write(",");
+		fw.newLine();
+		recordBuff.append("(");
+		}
+
+		recordBuff.append("'"+s+"'"+","+ "'"+"Control"+"'"+ ")");
+
+		fw.write(recordBuff.toString());
+		recordBuff.setLength(0);
+	}
+	fw.write(";");
+	fw.newLine();
+
+
+	colNameBuff.setLength(0);
+	recordBuff.setLength(0);
+	flag=0;
+	for (File file : listOfFiles) {
+
+		if(file.getName().equalsIgnoreCase("master config - controls - validation.xlsx - Sheet1.csv")) {
+			System.out.println("writing target file "+file.getName());
+
+			colNameBuff.append("INSERT INTO control_sample_variants_reference "+ "(");
+			colNameBuff.append("sample_id,target_name,chromosome,position,ref_allele,alt_allele,gene,cdna_change,protein_change,expected_al,expected_al_start,expected_al_end) VALUES ");
+			fw.write(colNameBuff.toString());
+			for (String key : masterConfigMap.keySet()) {
+
+				String[] records = masterConfigMap.get(key);
+				if(flag==0) 
+				{
+					recordBuff.append("(");
+					flag=1;
+				}
+				else
+				{fw.write(",");
+				fw.newLine();
+				recordBuff.append("(");
+				}
+				recordBuff.append( "(select id from sample where lims_sample_id ='"+records[0]+"')");
+				recordBuff.append(","+"'"+records[1]+"'");
+				recordBuff.append(","+"'"+records[2]+"'");
+				recordBuff.append(","+"'"+records[3]+"'");
+				recordBuff.append(","+"'"+records[4]+"'");
+
+				recordBuff.append(","+"'"+records[5]+"'");
+				recordBuff.append(","+"'"+records[6]+"'");
+
+				recordBuff.append(","+"'"+records[7]+"'");
+				recordBuff.append(","+"'"+records[8]+"'");
+				recordBuff.append(","+"'"+records[9]+"'");
+				recordBuff.append(","+"'"+records[10]+"'");
+				recordBuff.append(","+"'"+records[11]+"'"+")");
+
+				fw.write(recordBuff.toString());
+				recordBuff.setLength(0);
+			}
+			fw.write(";");
+
+		}
+
+	}
+
+
+
+
+
+
+
+	fw.close(); 
+
+
+}
 
 }
 
