@@ -1,34 +1,25 @@
 package com.sema.util;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import java.sql.*;
 
 
 public class RandomGen {
 
-	@SuppressWarnings("deprecation")
 	public static void main(String[] args) {}
 
 
-void writeExcelContentToSQlFile(BufferedWriter fw) throws IOException{
+void writeExcelContentToSQlFile(BufferedWriter fw, String type) throws IOException{
 
 
 	HashMap<String,String[]> masterConfigMap = new HashMap<String,String[]>();
@@ -80,6 +71,7 @@ void writeExcelContentToSQlFile(BufferedWriter fw) throws IOException{
 			masterConfigMap.put(records[0]+"_"+records[1]+"_"+records[3]+"_"+records[4]+"_"+records[5], records);
 		}
 		file.close();
+		workbook.close();
 	}
 	catch (Exception e)
 	{
@@ -95,16 +87,10 @@ void writeExcelContentToSQlFile(BufferedWriter fw) throws IOException{
 			System.out.println(file.getName());
 		}
 	}
-	String line1="";
-	String extension = "";
-	String fileSql = "targetSql.txt";
-	StringBuffer fileBuff = new StringBuffer("");
+	
 	StringBuffer colNameBuff = new StringBuffer("");
 	StringBuffer recordBuff = new StringBuffer("");
-	HashMap<String,Integer> geneSet = new HashMap<String,Integer>();
-	ArrayList<String> runCombIdList = new ArrayList<String>();
-	String temp ="";
-	String cvsSplitBy = ",";
+
 
 	//BufferedWriter fw = new BufferedWriter(new FileWriter(fileSql)) ;
 
@@ -114,7 +100,7 @@ void writeExcelContentToSQlFile(BufferedWriter fw) throws IOException{
 	int flag =0;
 
 
-	colNameBuff.append("INSERT INTO SAMPLE "+ "(");
+	colNameBuff.append("INSERT INTO sample "+ "(");
 	colNameBuff.append("lims_sample_id,sample_type) VALUES  ");
 	fw.write(colNameBuff.toString());
 	for (String s: idSet) {
@@ -131,7 +117,7 @@ void writeExcelContentToSQlFile(BufferedWriter fw) throws IOException{
 		recordBuff.append("(");
 		}
 
-		recordBuff.append("'"+s+"'"+","+ "'"+"Control"+"'"+ ")");
+		recordBuff.append("'"+s+"'"+","+ "'"+type+"'"+ ")");
 
 		fw.write(recordBuff.toString());
 		recordBuff.setLength(0);
@@ -143,10 +129,7 @@ void writeExcelContentToSQlFile(BufferedWriter fw) throws IOException{
 	colNameBuff.setLength(0);
 	recordBuff.setLength(0);
 	flag=0;
-	for (File file : listOfFiles) {
-
-		if(file.getName().equalsIgnoreCase("master config - controls - validation.xlsx - Sheet1.csv")) {
-			System.out.println("writing target file "+file.getName());
+	
 
 			colNameBuff.append("INSERT INTO control_sample_variants_reference "+ "(");
 			colNameBuff.append("sample_id,target_name,chromosome,position,ref_allele,alt_allele,gene,cdna_change,protein_change,expected_al,expected_al_start,expected_al_end) VALUES ");
@@ -183,18 +166,6 @@ void writeExcelContentToSQlFile(BufferedWriter fw) throws IOException{
 				recordBuff.setLength(0);
 			}
 			fw.write(";");
-
-		}
-
-	}
-
-
-
-
-
-
-
-	fw.close(); 
 
 
 }
