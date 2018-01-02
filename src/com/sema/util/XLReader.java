@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,20 +39,23 @@ public class XLReader {
 		String targetFileName = prop.getProperty("targetfilecsv");
 		String startSqlFileName = prop.getProperty("startsqlfile");
 		String endSqlFileName = prop.getProperty("endsqlfile");
+		String typeControl = prop.getProperty("typeControl");
+		String outputfiledir = prop.getProperty("outputfiledir");
 		File[] listOfFiles = folder.listFiles();
 
 		String line1 = "";
 		String extension = "";
-		String fileSql = prop.getProperty("fileSql");
+		String outFileName = prop.getProperty("fileSql");
 		StringBuffer colNameBuff = new StringBuffer("");
 		StringBuffer recordBuff = new StringBuffer("");
 		HashMap<String, String> geneSet = new HashMap<String, String>();
 		ArrayList<String> runCombIdList = new ArrayList<String>();
 		String temp = "";
+		Connection con = null;
 		try {
-			BufferedWriter fw = new BufferedWriter(new FileWriter(fileSql));
+			BufferedWriter fw = new BufferedWriter(new FileWriter(outputfiledir + outFileName));
 			Class.forName("com.mysql.jdbc.Driver");
-			Connection con = DriverManager.getConnection(prop.getProperty("database"), prop.getProperty("dbuser"),
+			con = DriverManager.getConnection(prop.getProperty("database"), prop.getProperty("dbuser"),
 					prop.getProperty("dbpassword"));
 			Statement stmt = con.createStatement();
 			Statement geneStmt = con.createStatement();
@@ -69,10 +73,10 @@ public class XLReader {
 							fw.write(line1);
 							fw.newLine();
 
-						} // while end
+						} 
 
 					}
-				} // If file End
+				} 
 				br.close();
 			}
 
@@ -141,7 +145,9 @@ public class XLReader {
 					fw.newLine();
 					colNameBuff.append("INSERT INTO target " + "(");
 					br.readLine();
-					colNameBuff.append("name,gene_id,exons,chromosome,start_index,end_index,q25_quartile,median,q75_quartile,run_combination_id)" + " VALUES ");
+					colNameBuff.append(
+							"name,gene_id,exons,chromosome,start_index,end_index,q25_quartile,median,q75_quartile,run_combination_id)"
+									+ " VALUES ");
 					fw.write(colNameBuff.toString());
 					int flag = 0;
 					String csvData[];
@@ -156,14 +162,22 @@ public class XLReader {
 								fw.newLine();
 								recordBuff.append("(");
 							}
-							csvData=line1.split(",");
-							for(int k=0;k<csvData.length;k++)
-							{if(k==1)
-								recordBuff.append("(select id from gene where name ='"+csvData[k] + "' and run_combination_id="+runCombIdList.get(i)+"),");
-							else	
-							recordBuff.append("'"+csvData[k]+"',");
+							csvData = line1.split(",");
+							for (int k = 0; k < csvData.length; k++) {
+								if (k == 1)
+									recordBuff.append("(select id from gene where name ='" + csvData[k]
+											+ "' and run_combination_id=" + runCombIdList.get(i) + "),");
+								else
+									{
+									if(csvData[k].charAt(0)=='"' && csvData[k].charAt(csvData[k].length()-1)!='"' )
+										{recordBuff.append("'" + csvData[k].substring(1) +","+csvData[k+1].substring(0,csvData[k+1].length()-1) +"',");
+										++k;}
+										else 
+										recordBuff.append("'" + csvData[k] + "',");
+									
+									}
 							}
-							recordBuff.append( runCombIdList.get(i) + ")");
+							recordBuff.append(runCombIdList.get(i) + ")");
 							fw.write(recordBuff.toString());
 
 							recordBuff.setLength(0);
@@ -175,6 +189,13 @@ public class XLReader {
 				}
 			}
 
+			
+			//writing sample related queries
+			RandomGen addSampleQueries = new RandomGen();
+			addSampleQueries.writeExcelContentToSQlFile(fw, typeControl);
+			
+			
+			
 			// Writing to GeneGeneCategory
 			ResultSet gst = geneStmt.executeQuery("SELECT * FROM gene;");
 			int i = 1;
@@ -202,12 +223,22 @@ public class XLReader {
 				} // If file End
 				br.close();
 			}
-			RandomGen addSampleQueries = new RandomGen();
-			addSampleQueries.writeExcelContentToSQlFile(fw);
+
 			con.close();
 			fw.close();
+		} catch (SQLException se) {
+			se.printStackTrace();
 		} catch (Exception e) {
 			System.out.println(e);
+			e.printStackTrace();
+		} finally {
+			// finally block used to close resources
+			try {
+				if (con != null)
+					con.close();
+			} catch (SQLException se) {
+				se.printStackTrace();
+			} // end finally try
 		}
 
 		/*
