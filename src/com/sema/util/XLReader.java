@@ -27,6 +27,7 @@ public class XLReader {
 		prop.load(input);
 
 		File folder = new File(prop.getProperty("filedir"));
+		String fileDir=prop.getProperty("filedir");
 		String geneCatFile1 = prop.getProperty("geneCatFile1");
 		String geneCatFile2 = prop.getProperty("geneCatFile2");
 		String geneCatFile3 = prop.getProperty("geneCatFile3");
@@ -37,11 +38,13 @@ public class XLReader {
 		String geneCatName3 = prop.getProperty("geneCatName3");
 		String geneCatName4 = prop.getProperty("geneCatName4");
 		String targetFileName = prop.getProperty("targetfilecsv");
+		String alterDelSqlFileName=prop.getProperty("alterdelfileName");
 		String startSqlFileName = prop.getProperty("startsqlfile");
 		String endSqlFileName = prop.getProperty("endsqlfile");
 		String typeControl = prop.getProperty("typeControl");
 		String outputfiledir = prop.getProperty("outputfiledir");
 		File[] listOfFiles = folder.listFiles();
+		String alterDeleteFlag=prop.getProperty("alterdeleteflag");
 
 		String line1 = "";
 		String extension = "";
@@ -50,6 +53,14 @@ public class XLReader {
 		StringBuffer recordBuff = new StringBuffer("");
 		HashMap<String, String> geneSet = new HashMap<String, String>();
 		ArrayList<String> runCombIdList = new ArrayList<String>();
+		runCombIdList.add("1");
+		runCombIdList.add("2");
+		runCombIdList.add("3");
+		runCombIdList.add("4");
+		runCombIdList.add("5");
+		runCombIdList.add("6");
+		runCombIdList.add("7");
+		runCombIdList.add("8");
 		String temp = "";
 		Connection con = null;
 		try {
@@ -60,6 +71,20 @@ public class XLReader {
 			Statement stmt = con.createStatement();
 			Statement geneStmt = con.createStatement();
 
+			
+			if(alterDeleteFlag.equalsIgnoreCase("true")) 
+			{
+				BufferedReader br = new BufferedReader(new FileReader(fileDir+alterDelSqlFileName));
+				while ((line1 = br.readLine()) != null) {
+					fw.write(line1);
+					fw.newLine();
+
+				} 
+				br.close();
+			}
+			
+			
+			
 			for (File file : listOfFiles) {
 				BufferedReader br = new BufferedReader(new FileReader(file));
 				if (file.isFile()) {
@@ -116,10 +141,11 @@ public class XLReader {
 			int flag1 = 0;
 			fw.newLine();
 			fw.write("insert into gene(`name`,`run_combination_id`) values");
-			while (rs.next()) {
+			for (int x=0; x<runCombIdList.size(); x++){
 				// System.out.println(rs.getInt(1)+" "+rs.getInt(4));
-				temp = Integer.toString(rs.getInt(1));
-				runCombIdList.add(temp);
+				//temp = Integer.toString(rs.getInt(1)); for fetching runcomdid thr db
+				//runCombIdList.add(temp);
+				temp = runCombIdList.get(x);
 
 				for (String key : geneSet.keySet()) {
 					if (flag1 == 0) {
@@ -197,15 +223,34 @@ public class XLReader {
 			
 			
 			// Writing to GeneGeneCategory
-			ResultSet gst = geneStmt.executeQuery("SELECT * FROM gene;");
+			ResultSet gst = geneStmt.executeQuery("SELECT * FROM run_combination;");
 			int i = 1;
 			fw.newLine();
-			while (gst.next()) {
-				fw.write("insert into gene_genecategory (`id`,`genecategory_id`,`gene_id`)values (" + i++ + ","
-						+ "(select id from genecategory where category_name='" + geneSet.get(gst.getString(2)) + "')"
-						+ "," + gst.getInt(1) + ");");
-				fw.newLine();
+			
+			 flag1 = 0;
+			fw.newLine();
+			fw.write("insert into gene_genecategory (`id`,`genecategory_id`,`gene_id`) values");
+			for (int x=0; x<runCombIdList.size(); x++) {
+				// System.out.println(rs.getInt(1)+" "+rs.getInt(4));
+				//temp = Integer.toString(gst.getInt(1));
+				
+				temp = runCombIdList.get(x);
+				for (String key : geneSet.keySet()) {
+					if (flag1 == 0) {
+						fw.write("(");
+						flag1 = 1;
+					} else {
+						fw.write(",");
+						fw.newLine();
+						fw.write("(");
+					}
+					// System.out.println(itr.next());
+					fw.write(i++ + ",(select id from genecategory where category_name='"+geneSet.get(key)+"')," +"(select id from gene where name ='"+key + "' and run_combination_id="+temp + "))");
+
+				}
 			}
+			fw.write(";");
+			fw.newLine();
 			// Writing after Target table and Gene_genecategory entries
 			for (File file : listOfFiles) {
 				BufferedReader br = new BufferedReader(new FileReader(file));
