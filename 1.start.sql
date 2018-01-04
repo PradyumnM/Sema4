@@ -24,75 +24,6 @@ insert into instrument values(7,'Ion Torrent Chef #03 at Branford',1,2,'03');
 insert into instrument values(8,'Ion Torrent Chef #04 at Branford',1,2,'04');
 
 
-
-
-
-
-insert into sample values (null,'RSM64726-11',null,null,null,null,null,null,null,null,null,null,null,null,null,'Control');
-insert into sample values (null,'STD134-14',null,null,null,null,null,null,null,null,null,null,null,null,null,'Control');
-insert into sample values (null,'STD169-11',null,null,null,null,null,null,null,null,null,null,null,null,null,'Control');	
-insert into sample values (null,'STD171-3',null,null,null,null,null,null,null,null,null,null,null,null,null,'Control');
-insert into sample values (null,'STD173-3',null,null,null,null,null,null,null,null,null,null,null,null,null,'Control');
-insert into sample values (null,'STD175-3',null,null,null,null,null,null,null,null,null,null,null,null,null,'Control');
-insert into sample values (null,'STD177-13',null,null,null,null,null,null,null,null,null,null,null,null,null,'Control');
-insert into sample values (null,'STD177-14',null,null,null,null,null,null,null,null,null,null,null,null,null,'Control');
-insert into sample values (null,'STD179-3',null,null,null,null,null,null,null,null,null,null,null,null,null,'Control');
-insert into sample values (null,'STD181-3',null,null,null,null,null,null,null,null,null,null,null,null,null,'Control');
-insert into sample values (null,'STD183-3',null,null,null,null,null,null,null,null,null,null,null,null,null,'Control');
-insert into sample values (null,'STD39-1109',null,null,null,null,null,null,null,null,null,null,null,null,null,'NTC_DNA');
-insert into sample values (null,'STD39-1110',null,null,null,null,null,null,null,null,null,null,null,null,null,'NTC_RNA');
-
-
-
-
-insert into sample values (null,'STD135-14',null,null,null,null,null,null,null,null,null,null,null,null,null,'NTC_RNA');
-insert into sample values (null,'STD172-3',null,null,null,null,null,null,null,null,null,null,null,null,null,'Control');
-insert into sample values (null,'STD-174-3',null,null,null,null,null,null,null,null,null,null,null,null,null,'Control');
-insert into sample values (null,'STD176-3',null,null,null,null,null,null,null,null,null,null,null,null,null,'Control');
-insert into sample values (null,'STD180-3',null,null,null,null,null,null,null,null,null,null,null,null,null,'Control');
-
-
-
-insert into sample (lims_sample_id,sample_type)
-	values 
-	('RSM64953-18','Control'),
-	('RSM64953-14','Control'),
-	('RSM64953-16','Control'),
-	('RSM64956-7','Control'),
-	('STD301-11','Control'),
-	('STD119-55','Control'),
-	('STD61-133','Control'),
-	('STD188-25','Control');
-
-	
-
-
-
-
-
-
-
-
-
-
-
-
-insert into control_sample_variants_reference (sample_id,target_name,chromosome,position,ref_allele,alt_allele,gene,cdna_change,protein_change,expected_al,expected_al_start,expected_al_end)
-values
-(1,'SP_148.9816','chr3',178936091,'G','A','PIK3CA','c.1633G>A','p.E545K',0.00,0.00,0.01),
-(2,'OCP1_RB1_12','chr13',48934151,'AG','A','RB1','c.610delG','p.E204fs*10',1.00,0.95,1.00),
-(2,'TP53_1.46429','chr17',7576855,'G','A','TP53','c.991C>T','p.Q331*',1.00,0.95,1.00),
-(3,'SMARCA4_30.26076','chr19',11152007,'G','T','SMARCA4','c.4195G>T','p.E1399*',1.00,0.95,1.00),
-(4,'TP53_7.361197_and_TP53_7.148281_overlap','chr17',7577538,'C','T','TP53','c.743G>A','p.R248Q',1.00,0.95,1.00),
-(5,'SP_148.9816','chr3',178936091,'G','A','PIK3CA','c.1633G>A','p.E545K',0.50,0.40,0.60),
-(6,'CHP2_RB1_10','chr13',49039164,'G','T','RB1','c.2242G>T','p.E748*',1.00,0.95,1.00),
-(7,'TP53_10.1.366103','chr17',7578177,'C','A','TP53','c.672G>T','p.E224D',0.03,0.01,0.04),
-(8,'TP53_10.1.366103','chr17',7578177,'C','A','TP53','c.672G>T','p.E224D',1.00,0.95,1.00),
-(9,'OCP1_STK11_9','chr19',1220595,'G','A','STK11','c.613G>A','p.A205T ',0.50,0.40,0.60),
-(10,'OCP1_ATM_39','chr11',108137925,'C','T','ATM','c.2494C>T','p.R832C ',0.50,0.40,0.60),
-(11,'SP_150.100237','chr3',178952085,'A','G','PIK3CA','c.3140A>G','P.H1047R',0.50,0.40,0.60);
-
-
 insert into run_combination values (1,1,1,1);
 insert into run_combination values (2,1,1,2);
 insert into run_combination values (3,1,1,3);
@@ -106,4 +37,3 @@ insert into genecategory values (1,'All Coding Exons Sequenced');
 insert into genecategory values(2,'Hotspot Regions Sequenced');
 insert into genecategory values (3,'Rearrangements/Fusions Queried');
 insert into genecategory values(4,'Copy Number Abnnormalities Queried');
-
