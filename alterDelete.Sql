@@ -1,0 +1,39 @@
+delete from file_ref where modified_by>0;
+delete from user where id>0;
+delete from bench_configurations where site_id>0;
+delete from target_bins where id>0;
+delete from gene_genecategory where id>0;
+delete from control_sample_variants_reference where sample_id>0;
+delete from sample  where id>0;
+delete from target where id>0;
+delete from gene where id>0;
+delete from genecategory where id>0;
+delete from run_combination where id>0;
+delete from instrument where id>0;
+delete from instrument_type where id>0;
+delete from user where id>0;
+delete from practice where id>0;
+delete from site where id>0;
+delete from report_template where id>0;
+delete from test where id>0;
+delete from panel where id>0;
+delete from chip where id>0;
+
+ALTER TABLE target_bins AUTO_INCREMENT =1;
+ALTER TABLE target AUTO_INCREMENT =1;
+ALTER TABLE run_qc_parameter AUTO_INCREMENT =1;
+ALTER TABLE gene_genecategory AUTO_INCREMENT =1;
+ALTER TABLE genecategory AUTO_INCREMENT =1;
+ALTER TABLE gene AUTO_INCREMENT =1;
+ALTER TABLE run_combination AUTO_INCREMENT =1;
+ALTER TABLE control_sample_variants_reference AUTO_INCREMENT =1;
+ALTER TABLE sample AUTO_INCREMENT =1;
+ALTER TABLE instrument AUTO_INCREMENT =1;
+ALTER TABLE instrument_type AUTO_INCREMENT =1;
+ALTER TABLE site AUTO_INCREMENT =1;
+ALTER TABLE test AUTO_INCREMENT =1;
+ALTER TABLE panel AUTO_INCREMENT =1;
+ALTER TABLE chip AUTO_INCREMENT =1;
+ALTER TABLE user AUTO_INCREMENT =1;
+
+
