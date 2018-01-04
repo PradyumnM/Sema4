@@ -36,17 +36,12 @@ insert into bench_configurations(site_id,panel_id,folder_name,pipeline_name)
 (1,1,'Clinical production - Solid - Branford','OCAv3_clinical_production_RC001_pipe');
 
 
-insert into file_ref (id,file_name,type,url,modified_by) values
-	(1,'RSM64730-11','VCF','/variantcaller/4900/19/Out_RSM64730-11.vcf',1),
-	(2,'RSM64731-11','VCF','/variantcaller/4900/20/Out_RSM64731-11.vcf',1),
-	(3,'RSM64732-11','VCF','/variantcaller/4900/21/Out_RSM64732-11.vcf',1),
-	(4,'RSM64719-11','VCF','/variantcaller/4900/22/Out_RSM64719-11.vcf',1),
-	(5,'RSM64720-11','VCF','/variantcaller/4900/23/Out_RSM64720-11.vcf',1);
 
 
 
 
-DELETE from user;
+
+
 alter TABLE user AUTO_INCREMENT=1;
 
 insert into user values(null,'SYSTEM','SYSTEM','SYSTEM','SYSTEM');
@@ -69,3 +64,10 @@ insert into user values(null,"hong.lu@sema4genomics.com","Hong ","Lu","hong.lu@s
 insert into user values(null,"chetanya.pandya@sema4genomics.com","Chetanya ","Pandya","chetanya.pandya@sema4genomics.com");
 insert into user values(null,"aye.moe@sema4genomics.com","Aye ","Moe","aye.moe@sema4genomics.com");
 insert into user values(null,"kai.ying@sema4genomics.com","Kai ","Ying","kai.ying@sema4genomics.com");
+
+insert into file_ref (id,file_name,type,url,modified_by) values
+	(1,'RSM64730-11','VCF','/variantcaller/4900/19/Out_RSM64730-11.vcf',1),
+	(2,'RSM64731-11','VCF','/variantcaller/4900/20/Out_RSM64731-11.vcf',1),
+	(3,'RSM64732-11','VCF','/variantcaller/4900/21/Out_RSM64732-11.vcf',1),
+	(4,'RSM64719-11','VCF','/variantcaller/4900/22/Out_RSM64719-11.vcf',1),
+	(5,'RSM64720-11','VCF','/variantcaller/4900/23/Out_RSM64720-11.vcf',1);
